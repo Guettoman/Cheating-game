@@ -1,0 +1,20 @@
+{% extends 'global/Page.html' %}
+{% load otree %}
+
+{% block title %}
+Результаты раунда
+{% endblock %}
+
+{% block content %}
+<p>Ваш выбор: {{ role }}</p>
+<p>Разрешено списывание: {{ giver_choice }}</p>
+{% if role == 'receiver' and giver_choice %}
+    <p>Ваши усилия: {{ receiver_effort }}</p>
+    {% if caught %}
+        <p>Вас поймали!</p>
+    {% endif %}
+{% endif %}
+<p>Выигрыш в этом раунде: {{ round_payoff }}</p>
+
+{% next_button %}
+{% endblock %}

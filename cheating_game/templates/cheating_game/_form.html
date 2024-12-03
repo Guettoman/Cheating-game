@@ -1,0 +1,11 @@
+{% load otree %}
+
+<p>
+    {% if player.role == 'giver' %}
+        {{ form.giver_choice.label_tag }} {{ form.giver_choice }}
+    {% elif player.role == 'receiver' and group.giver_choice %}
+        {{ form.receiver_effort.label }} {{ form.receiver_effort }}
+    {% endif %}
+</p>
+
+{% next_button %}

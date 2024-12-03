@@ -1,0 +1,15 @@
+{% extends 'global/Page.html' %}
+{% load otree %}
+
+{% block title %}
+Результаты
+{% endblock %}
+
+{% block content %}
+<h2>Результаты игры</h2>
+<p>Всего раундов: {{ rounds }}</p>
+<p>Ваш общий выигрыш: {{ player.payoff }}</p>
+<p>Общий выигрыш всех игроков: {{ total_payoff }}</p>
+
+
+{% endblock %}

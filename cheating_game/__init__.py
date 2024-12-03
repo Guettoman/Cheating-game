@@ -1,12 +1,14 @@
 from otree.api import *
 import random
 
-class Constants(BaseConstants):
-    name_in_url = 'cheating_game'
-    players_per_group = 2
-    num_rounds = 10
+class C(BaseConstants):
+    NAME_IN_URL= 'cheating_game'
+    PLAYERS_PER_GROUP = 2
+    NUM_ROUNDS = 10
     endowment_giver = 10
     endowment_receiver = 0
+    GIVER_ROLE = 'giver'
+    RECEIVER_ROLE = 'receiver'
 
 class Subsession(BaseSubsession):
     pass
@@ -24,43 +26,30 @@ class Group(BaseGroup):
     caught = models.BooleanField()
 
 class Player(BasePlayer):
-    player_payoff = models.CurrencyField(initial=0)
-    player_role = models.StringField()
-    round_payoff = models.CurrencyField(initial=0)
+    pass
 
 def creating_session(subsession: Subsession):
     if subsession.round_number == 1:
         subsession.group_randomly()
     elif subsession.session.config['changing_partners']:
         subsession.group_randomly()
-    assign_roles(subsession)
-
-def assign_roles(subsession):
-    for group in subsession.get_groups():
-        players = group.get_players()
-        if len(players) == 2:
-            first_role = random.choice(['giver', 'receiver'])
-            players[0].player_role = first_role
-            players[1].player_role = 'receiver' if first_role == 'giver' else 'giver'
 
 def set_payoffs(player: Player):
     group = player.group
     if group.giver_choice == False:
-        if player.player_role == 'giver':
-            player.round_payoff = Constants.endowment_giver
+        if player.role == 'giver':
+            player.payoff = C.endowment_giver
         else:
-            player.round_payoff = Constants.endowment_receiver
+            player.payoff = C.endowment_receiver
     else:
         group.caught = random.random() > (group.receiver_effort / 100)
         if group.caught:
-            player.round_payoff = 0
+            player.payoff = 0
         else:
-            if player.player_role == 'giver':
-                player.round_payoff = 12
+            if player.role == 'giver':
+                player.payoff = 12
             else:
-                player.round_payoff = 60 - 0.45 * group.receiver_effort
-    
-    player.player_payoff = player.player_payoff + player.round_payoff
+                player.payoff = 60 - 0.45 * group.receiver_effort
 
 
 class Instructions(Page):
@@ -77,7 +66,7 @@ class GiverDecision(Page):
     form_model = 'group'
     form_fields = ['giver_choice']
     def is_displayed(player: Player):
-        return player.player_role == 'giver'
+        return player.role == 'giver'
 
 class ReceiverWaitPage(WaitPage):
     pass
@@ -86,7 +75,7 @@ class ReceiverDecision(Page):
     form_model = 'group'
     form_fields = ['receiver_effort']
     def is_displayed(player: Player):
-        return player.player_role == 'receiver' and player.group.giver_choice
+        return player.role == 'receiver' and player.group.giver_choice
 
 class GiverWaitPage(WaitPage):
     pass
@@ -100,23 +89,20 @@ class ResultsRound(Page):
             'giver_choice': group.giver_choice,
             'receiver_effort': group.receiver_effort if group.giver_choice else None,
             'caught': group.caught if group.giver_choice else None,
-            'round_payoff': player.round_payoff,
-            'player_role': player.player_role,
-            'role': player.player_role
+            'round_payoff': player.payoff,
+            'role': player.role
         }
 
 class Results(Page):
-    def before_next_page(player: Player, timeout_happened = False):
-        set_payoffs(player)
-
-    def vars_for_template(self):
-        total_payoff = sum([p.player_payoff for p in self.subsession.get_players()])
+    def vars_for_template(player: Player):
+        total_payoff = player.total_payoff
         return {
-            'total_payoff': total_payoff,
-            'rounds': self.subsession.round_number,
+            'player_total_payoff': total_payoff,
+            'rounds': player.subsession.round_number,
         }
 
 page_sequence = [Instructions, WaitForRoleAssignment,
                  RoleAssignment, GiverDecision,
                  ReceiverWaitPage, ReceiverDecision,
-                 GiverWaitPage, ResultsRound, Results]
+                 GiverWaitPage, ResultsRound]
+

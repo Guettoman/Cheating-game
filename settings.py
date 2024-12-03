@@ -13,7 +13,7 @@ SESSION_CONFIGS = [
         num_demo_participants=2,
         app_sequence=['cheating_game'],
         changing_partners=False,  # True - партнёры меняются, False - партнёры постоянные
-        num_rounds=5,  # Укажите желаемое количество раундов
+        num_rounds=10,  # Укажите желаемое количество раундов
     ),
 ]
 

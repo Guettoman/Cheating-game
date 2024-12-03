@@ -8,8 +8,8 @@
 {% block content %}
 <h2>Результаты игры</h2>
 <p>Всего раундов: {{ rounds }}</p>
-<p>Ваш общий выигрыш: {{ player.payoff }}</p>
+<p>Ваш общий выигрыш: {{ player.player_payoff }}</p>
 <p>Общий выигрыш всех игроков: {{ total_payoff }}</p>
-
+{% next_button %}
 
 {% endblock %}

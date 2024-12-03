@@ -5,9 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if group.giver_choice is None %}
-        <p>Waiting for the giver to make a decision...</p>
-    {% elif group.giver_choice %}
+    {% if group.giver_choice %}
         <p>The giver allowed you to cheat. Enter your effort level (0-100):</p>
         <form method="post">
             {{ form.receiver_effort.errors }}

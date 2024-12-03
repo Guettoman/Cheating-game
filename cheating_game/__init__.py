@@ -1,9 +1,6 @@
-from otree.api import (
-    models, widgets, BaseConstants, BaseSubsession, BaseGroup, BasePlayer, Page, WaitPage, Currency as c, currency_range
-)
+from otree.api import *
 import random
 
-# Constants
 class Constants(BaseConstants):
     name_in_url = 'cheating_game'
     players_per_group = 2
@@ -11,32 +8,26 @@ class Constants(BaseConstants):
     endowment_giver = 10
     endowment_receiver = 0
 
-# Models
 class Subsession(BaseSubsession):
     pass
 
 class Group(BaseGroup):
     giver_choice = models.BooleanField(
-        choices=[
-            [True, "Разрешить списывание"],
-            [False, "Не разрешать списывание"]
-        ],
+        choices=[[True, "Разрешить списывание"], [False, "Не разрешать списывание"]],
         widget=widgets.RadioSelect
     )
     receiver_effort = models.FloatField(
         min=0, max=100,
-        label="Усилия по списыванию (от 0 до 100)",
+        label="Усилия по списывание (от 0 до 100)",
         blank=True
     )
     caught = models.BooleanField()
 
 class Player(BasePlayer):
-    player_payoff = models.CurrencyField()
+    player_payoff = models.CurrencyField(initial=0)
     player_role = models.StringField()
-    round_payoff = models.CurrencyField()
+    round_payoff = models.CurrencyField(initial=0)
 
-
-#FUNCTIONS
 def creating_session(subsession: Subsession):
     if subsession.round_number == 1:
         subsession.group_randomly()
@@ -54,15 +45,13 @@ def assign_roles(subsession):
 
 def set_payoffs(player: Player):
     group = player.group
-
     if group.giver_choice == False:
         if player.player_role == 'giver':
             player.round_payoff = Constants.endowment_giver
         else:
             player.round_payoff = Constants.endowment_receiver
     else:
-        group.caught = random.random() < (group.receiver_effort / 100)
-
+        group.caught = random.random() > (group.receiver_effort / 100)
         if group.caught:
             player.round_payoff = 0
         else:
@@ -70,12 +59,13 @@ def set_payoffs(player: Player):
                 player.round_payoff = 12
             else:
                 player.round_payoff = 60 - 0.45 * group.receiver_effort
-    player.player_payoff += player.round_payoff
-    player.save()
+    
+    player.player_payoff = player.player_payoff + player.round_payoff
 
-# PAGES
+
 class Instructions(Page):
-    pass
+    def is_displayed(self):
+        return self.round_number == 1
 
 class WaitForRoleAssignment(WaitPage):
     pass
@@ -86,23 +76,25 @@ class RoleAssignment(Page):
 class GiverDecision(Page):
     form_model = 'group'
     form_fields = ['giver_choice']
-    
     def is_displayed(player: Player):
         return player.player_role == 'giver'
 
-class ReceiverDecision(Page):
-    form_model = 'group'
-    form_fields = ['receiver_effort']
+class ReceiverWaitPage(WaitPage):
+    pass
 
 class ReceiverDecision(Page):
     form_model = 'group'
     form_fields = ['receiver_effort']
-
     def is_displayed(player: Player):
-        return player.player_role == 'receiver'
+        return player.player_role == 'receiver' and player.group.giver_choice
+
+class GiverWaitPage(WaitPage):
+    pass
+
 
 class ResultsRound(Page):
     def vars_for_template(player: Player):
+        set_payoffs(player)
         group = player.group
         return {
             'giver_choice': group.giver_choice,
@@ -110,10 +102,11 @@ class ResultsRound(Page):
             'caught': group.caught if group.giver_choice else None,
             'round_payoff': player.round_payoff,
             'player_role': player.player_role,
+            'role': player.player_role
         }
 
 class Results(Page):
-    def before_next_page(player: Player):
+    def before_next_page(player: Player, timeout_happened = False):
         set_payoffs(player)
 
     def vars_for_template(self):
@@ -123,4 +116,7 @@ class Results(Page):
             'rounds': self.subsession.round_number,
         }
 
-page_sequence = [Instructions, WaitForRoleAssignment, RoleAssignment, GiverDecision, ReceiverDecision, ResultsRound, Results]
+page_sequence = [Instructions, WaitForRoleAssignment,
+                 RoleAssignment, GiverDecision,
+                 ReceiverWaitPage, ReceiverDecision,
+                 GiverWaitPage, ResultsRound, Results]

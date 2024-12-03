@@ -1,0 +1,21 @@
+{% load otree %}
+
+{% block title %}
+    Receiver Decision
+{% endblock %}
+
+{% block content %}
+    {% if group.giver_choice is None %}
+        <p>Waiting for the giver to make a decision...</p>
+    {% elif group.giver_choice %}
+        <p>The giver allowed you to cheat. Enter your effort level (0-100):</p>
+        <form method="post">
+            {{ form.receiver_effort.errors }}
+            {{ form.receiver_effort }}
+            <input type="submit" value="Submit">
+        </form>
+    {% else %}
+        <p>The giver did not allow you to cheat. You will receive your standard endowment.</p>
+        <p><button type="button" onclick="location.href='{{ next_button_url }}'">Continue</button></p>
+    {% endif %}
+{% endblock %}

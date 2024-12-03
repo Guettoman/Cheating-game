@@ -12,7 +12,7 @@ SESSION_CONFIGS = [
         display_name="Игра в списывание",
         num_demo_participants=2,
         app_sequence=['cheating_game'],
-        changing_partners=True,  # True - партнёры меняются, False - партнёры постоянные
+        changing_partners=False,  # True - партнёры меняются, False - партнёры постоянные
         num_rounds=5,  # Укажите желаемое количество раундов
     ),
 ]

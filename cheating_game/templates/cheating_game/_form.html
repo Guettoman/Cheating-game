@@ -1,9 +1,9 @@
 {% load otree %}
 
 <p>
-    {% if player.role == 'giver' %}
+    {% if player.player_role == 'giver' %}
         {{ form.giver_choice.label_tag }} {{ form.giver_choice }}
-    {% elif player.role == 'receiver' and group.giver_choice %}
+    {% elif player.player_role == 'receiver' and group.giver_choice %}
         {{ form.receiver_effort.label }} {{ form.receiver_effort }}
     {% endif %}
 </p>

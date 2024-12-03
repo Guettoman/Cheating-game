@@ -1,0 +1,14 @@
+{% load otree %}
+
+{% block title %}
+    Giver Decision
+{% endblock %}
+
+{% block content %}
+    <p>As the giver, do you allow the receiver to cheat?</p>
+    <form method="post">
+        {{ form.giver_choice.errors }}
+        {{ form.giver_choice }}
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}

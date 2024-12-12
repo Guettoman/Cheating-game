@@ -4,7 +4,7 @@ import random
 class C(BaseConstants):
     NAME_IN_URL= 'cheating_game'
     PLAYERS_PER_GROUP = 2
-    NUM_ROUNDS = 10
+    NUM_ROUNDS = 2
     endowment_giver = 10
     endowment_receiver = 0
     GIVER_ROLE = 'giver'
@@ -26,7 +26,7 @@ class Group(BaseGroup):
     caught = models.BooleanField()
 
 class Player(BasePlayer):
-    pass
+    name = models.StringField(label="Ваше имя")
 
 def creating_session(subsession: Subsession):
     if subsession.round_number == 1:
@@ -51,11 +51,20 @@ def set_payoffs(player: Player):
             else:
                 player.payoff = 60 - 0.45 * group.receiver_effort
 
-
+    
 class Instructions(Page):
     def is_displayed(self):
         return self.round_number == 1
 
+
+class Login(Page):
+    form_model = 'player'
+    form_fields = ['name']
+
+    def is_displayed(self):
+        return self.round_number == 1
+    
+    
 class WaitForRoleAssignment(WaitPage):
     pass
 
@@ -65,6 +74,7 @@ class RoleAssignment(Page):
 class GiverDecision(Page):
     form_model = 'group'
     form_fields = ['giver_choice']
+    
     def is_displayed(player: Player):
         return player.role == 'giver'
 
@@ -79,7 +89,6 @@ class ReceiverDecision(Page):
 
 class GiverWaitPage(WaitPage):
     pass
-
 
 class ResultsRound(Page):
     def vars_for_template(player: Player):
@@ -101,7 +110,18 @@ class Results(Page):
             'rounds': player.subsession.round_number,
         }
 
-page_sequence = [Instructions, WaitForRoleAssignment,
+class FinalResults(Page):
+    def is_displayed(self):
+        return self.round_number == C.NUM_ROUNDS
+
+    def vars_for_template(self):
+        players = self.subsession.get_players()
+        return {
+            'players': players
+        }
+
+
+page_sequence = [Instructions, Login, WaitForRoleAssignment,
                  RoleAssignment, GiverDecision,
                  ReceiverWaitPage, ReceiverDecision,
                  GiverWaitPage, ResultsRound]

@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+
+{% block title %}Финальные результаты{% endblock %}
+
+{% block content %}
+
+  <h2>Финальные результаты</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Имя игрока</th>
+        <th>Общий заработок</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in players %}
+        <tr>
+          <td>{{ player.name }}</td>
+          <td>{{ player.total_payoff }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

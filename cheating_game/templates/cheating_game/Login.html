@@ -1,0 +1,16 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block title %}Вход в игру{% endblock %}
+
+{% block content %}
+
+  <p>Пожалуйста, введите ваше имя:</p>
+
+  <form method="post">
+    {{ form.name.errors }}
+    {{ form.name }}
+    <input type="submit" value="Submit">
+  </form>
+
+{% endblock %}

@@ -121,8 +121,7 @@ class FinalResults(Page):
             'players': players
         }
 
-
-page_sequence = [Instructions, Login, WaitForRoleAssignment,
+page_sequence = [Login, Instructions, WaitForRoleAssignment,
                  RoleAssignment, GiverDecision,
                  ReceiverWaitPage, ReceiverDecision,
-                 GiverWaitPage, ResultsRound]
+                 GiverWaitPage, ResultsRound, FinalResults]

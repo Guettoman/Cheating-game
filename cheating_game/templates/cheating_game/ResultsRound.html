@@ -8,13 +8,13 @@
 {% block content %}
 <p>Ваша роль: {{ role }}</p>
 <p>Разрешено списывание: {{ giver_choice }}</p>
-{% if role == 'receiver' and giver_choice %}
+{% if role == 'Списывающий' and giver_choice %}
     <p>Ваши усилия: {{ receiver_effort }}</p>
     {% if caught %}
         <p>Вас поймали!</p>
     {% endif %}
 {% endif %}
-{% if role == 'giver' and giver_choice and caught%}
+{% if role == 'Дающий списывать' and giver_choice and caught%}
     <p>Вас поймали!</p>
     <p>Усилия другого игрока: {{ receiver_effort }}</p>
 {% endif %}

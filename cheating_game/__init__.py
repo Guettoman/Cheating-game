@@ -4,11 +4,12 @@ import random
 class C(BaseConstants):
     NAME_IN_URL= 'cheating_game'
     PLAYERS_PER_GROUP = 2
-    NUM_ROUNDS = 2
+    NUM_ROUNDS = 10
     endowment_giver = 10
     endowment_receiver = 0
-    GIVER_ROLE = 'giver'
-    RECEIVER_ROLE = 'receiver'
+    hanging_partners = True
+    GIVER_ROLE = 'Дающий списывать'
+    RECEIVER_ROLE = 'Списывающий'
 
 class Subsession(BaseSubsession):
     pass
@@ -37,7 +38,7 @@ def creating_session(subsession: Subsession):
 def set_payoffs(player: Player):
     group = player.group
     if group.giver_choice == False:
-        if player.role == 'giver':
+        if player.role == 'Дающий списывать':
             player.payoff = C.endowment_giver
         else:
             player.payoff = C.endowment_receiver
@@ -46,7 +47,7 @@ def set_payoffs(player: Player):
         if group.caught:
             player.payoff = 0
         else:
-            if player.role == 'giver':
+            if player.role == 'Дающий списывать':
                 player.payoff = 12
             else:
                 player.payoff = 60 - 0.45 * group.receiver_effort
@@ -76,7 +77,7 @@ class GiverDecision(Page):
     form_fields = ['giver_choice']
     
     def is_displayed(player: Player):
-        return player.role == 'giver'
+        return player.role == 'Дающий списывать'
 
 class ReceiverWaitPage(WaitPage):
     pass
@@ -85,7 +86,7 @@ class ReceiverDecision(Page):
     form_model = 'group'
     form_fields = ['receiver_effort']
     def is_displayed(player: Player):
-        return player.role == 'receiver' and player.group.giver_choice
+        return player.role == 'Списывающий' and player.group.giver_choice
 
 class GiverWaitPage(WaitPage):
     pass
@@ -125,4 +126,3 @@ page_sequence = [Instructions, Login, WaitForRoleAssignment,
                  RoleAssignment, GiverDecision,
                  ReceiverWaitPage, ReceiverDecision,
                  GiverWaitPage, ResultsRound]
-

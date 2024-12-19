@@ -12,11 +12,12 @@ SESSION_CONFIGS = [
         display_name="Игра в списывание",
         num_demo_participants=2,
         app_sequence=['cheating_game'],
-        changing_partners=False,  # True - партнёры меняются, False - партнёры постоянные
-        num_rounds=10,  # Укажите желаемое количество раундов
+        changing_partners=True,
+        num_rounds=10,
     ),
 ]
 
+USE_POINTS = True
 LANGUAGE_CODE = 'en'
 USE_POINTS = True
-INSTALLED_APPS = ['otree']
+INSTALLED_APPS =  ['otree']
